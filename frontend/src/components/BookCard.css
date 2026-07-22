@@ -1,0 +1,111 @@
+.book-card {
+  display: flex;
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(107, 87, 184, 0.12);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-family: 'Manrope', sans-serif;
+  max-width: 320px;
+}
+
+.book-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(107, 87, 184, 0.2);
+}
+
+.book-spine {
+  width: 10px;
+  background: linear-gradient(180deg, #9B8AE0, #6B57B8);
+}
+
+.book-content {
+  padding: 20px;
+  flex: 1;
+  position: relative;
+}
+
+.book-status {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.status-available {
+  background: #FFF3DC;
+  color: #B4791F;
+}
+
+.status-issued {
+  background: #F1EAFB;
+  color: #6B57B8;
+}
+
+.book-title {
+  font-family: 'Fraunces', serif;
+  font-size: 19px;
+  color: #2B2140;
+  margin: 4px 90px 4px 0;
+  line-height: 1.3;
+}
+
+.book-author {
+  font-size: 14px;
+  color: #6E6483;
+  margin: 0 0 2px;
+}
+
+.book-category {
+  font-size: 12px;
+  color: #9B8AE0;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 16px;
+}
+
+.book-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.btn:hover {
+  opacity: 0.85;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.btn-edit {
+  background: #F1EAFB;
+  color: #6B57B8;
+}
+
+.btn-delete {
+  background: #FCEAEF;
+  color: #C24A6A;
+}
+
+.btn-issue {
+  background: #6B57B8;
+  color: #fff;
+  margin-left: auto;
+}
