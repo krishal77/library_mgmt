@@ -39,27 +39,29 @@ export default function Members() {
     setIsModalOpen(true);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name || !formData.email) return;
 
-    if (editingMember) {
-      editMember({
-        ...editingMember,
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-      });
-    } else {
-      const newMember = {
-        id: `MEM${String(members.length + 1).padStart(3, '0')}`,
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-      };
-      addMember(newMember);
+    try {
+      if (editingMember) {
+        await editMember({
+          ...editingMember,
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+        });
+      } else {
+        await addMember({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+        });
+      }
+      setIsModalOpen(false);
+    } catch (err) {
+      alert(err.message || 'Operation failed');
     }
-    setIsModalOpen(false);
   };
 
   return (
@@ -127,7 +129,7 @@ export default function Members() {
                           <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                         </svg>
                       </button>
-                      <button className="btn-icon delete" title="Delete Member" onClick={() => deleteMember(member.id)}>
+                      <button className="btn-icon delete" title="Delete Member" onClick={async () => { try { await deleteMember(member.id); } catch (err) { alert(err.message || 'Failed to delete member'); } }}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                           <polyline points="3 6 5 6 21 6"></polyline>
                           <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>

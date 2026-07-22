@@ -4,11 +4,19 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Connect to MongoDB Database
+// Connect to MongoDB database via Mongoose
 connectDB();
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+});
+
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is already in use. Please kill the process using port ${PORT} or restart.`);
+  } else {
+    console.error('Server error:', err);
+  }
 });

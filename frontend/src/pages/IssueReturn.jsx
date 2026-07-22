@@ -16,7 +16,7 @@ export default function IssueReturn() {
 
   const availableBooks = books.filter((b) => b.copies > 0);
 
-  const handleIssueSubmit = (e) => {
+  const handleIssueSubmit = async (e) => {
     e.preventDefault();
     if (!selectedMemberId || !selectedBookId) {
       setErrorMsg('Please select both a member and an available book.');
@@ -33,25 +33,21 @@ export default function IssueReturn() {
       return;
     }
 
-    const today = new Date().toISOString().split('T')[0];
-    const newIssue = {
-      id: `ISS${Math.floor(1000 + Math.random() * 9000)}`,
-      memberId: member.id,
-      memberName: member.name,
-      bookId: book.id,
-      bookTitle: book.title,
-      issueDate: today,
-      dueDate: dueDate,
-      returnDate: null,
-      status: 'Issued',
-    };
-
-    issueBook(newIssue);
-    setSelectedMemberId('');
-    setSelectedBookId('');
-    setErrorMsg('');
-    setSuccessMsg(`"${book.title}" successfully issued to ${member.name}.`);
-    setTimeout(() => setSuccessMsg(''), 4000);
+    try {
+      await issueBook({
+        bookId: book.id,
+        memberId: member.id,
+        dueDate: dueDate,
+      });
+      setSelectedMemberId('');
+      setSelectedBookId('');
+      setErrorMsg('');
+      setSuccessMsg(`"${book.title}" successfully issued to ${member.name}.`);
+      setTimeout(() => setSuccessMsg(''), 4000);
+    } catch (err) {
+      setErrorMsg(err.message || 'Failed to issue book');
+      setSuccessMsg('');
+    }
   };
 
   return (
@@ -187,7 +183,13 @@ export default function IssueReturn() {
                       <button
                         className="btn-secondary"
                         style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}
-                        onClick={() => returnBook(issue.id)}
+                        onClick={async () => {
+                          try {
+                            await returnBook(issue.id);
+                          } catch (err) {
+                            alert(err.message || 'Failed to return book');
+                          }
+                        }}
                       >
                         Return Book
                       </button>

@@ -32,11 +32,14 @@ export const createBook = async (req, res, next) => {
   try {
     const { title, author, isbn, category, quantity, available } = req.body;
 
-    if (!title || !author || !isbn || !category) {
-      return sendError(res, 'Please provide all required fields (title, author, isbn, category)', 400);
+    if (!title || !author || !category) {
+      return sendError(res, 'Please provide all required fields (title, author, category)', 400);
     }
 
-    const existingBook = await Book.findOne({ isbn });
+    // Auto-generate ISBN if not provided
+    const resolvedIsbn = isbn || `AUTO-${Date.now()}`;
+
+    const existingBook = await Book.findOne({ isbn: resolvedIsbn });
     if (existingBook) {
       return sendError(res, 'Book with this ISBN already exists', 400);
     }
@@ -44,7 +47,7 @@ export const createBook = async (req, res, next) => {
     const newBook = await Book.create({
       title,
       author,
-      isbn,
+      isbn: resolvedIsbn,
       category,
       quantity: quantity !== undefined ? quantity : 1,
       available: available !== undefined ? available : (quantity !== undefined ? quantity : 1)

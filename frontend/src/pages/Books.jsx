@@ -44,35 +44,36 @@ export default function Books() {
     setIsModalOpen(true);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.title || !formData.author) return;
 
     const copiesNum = parseInt(formData.copies, 10) || 1;
 
-    if (editingBook) {
-      editBook({
-        ...editingBook,
-        title: formData.title,
-        author: formData.author,
-        isbn: formData.isbn,
-        category: formData.category,
-        copies: copiesNum,
-        totalCopies: editingBook.totalCopies || copiesNum,
-      });
-    } else {
-      const newBook = {
-        id: `BK${Math.floor(100 + Math.random() * 900)}`,
-        title: formData.title,
-        author: formData.author,
-        isbn: formData.isbn,
-        category: formData.category,
-        copies: copiesNum,
-        totalCopies: copiesNum,
-      };
-      addBook(newBook);
+    try {
+      if (editingBook) {
+        await editBook({
+          ...editingBook,
+          title: formData.title,
+          author: formData.author,
+          isbn: formData.isbn,
+          category: formData.category,
+          copies: copiesNum,
+          totalCopies: editingBook.totalCopies || copiesNum,
+        });
+      } else {
+        await addBook({
+          title: formData.title,
+          author: formData.author,
+          isbn: formData.isbn,
+          category: formData.category,
+          copies: copiesNum,
+        });
+      }
+      setIsModalOpen(false);
+    } catch (err) {
+      alert(err.message || 'Operation failed');
     }
-    setIsModalOpen(false);
   };
 
   return (
@@ -152,7 +153,7 @@ export default function Books() {
                           <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                         </svg>
                       </button>
-                      <button className="btn-icon delete" title="Delete Book" onClick={() => deleteBook(book.id)}>
+                      <button className="btn-icon delete" title="Delete Book" onClick={async () => { try { await deleteBook(book.id); } catch (err) { alert(err.message || 'Failed to delete book'); } }}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                           <polyline points="3 6 5 6 21 6"></polyline>
                           <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>

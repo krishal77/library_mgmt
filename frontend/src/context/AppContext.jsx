@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { api } from '../services/api';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { bookApi, memberApi, issueApi } from '../services/api';
 
 const AppContext = createContext(null);
 
@@ -9,73 +9,84 @@ export const AppProvider = ({ children }) => {
   const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Load data on mount
+  // ─── Load data from the backend on mount ──────────────────
   useEffect(() => {
     const loadData = async () => {
-      const [b, m, i] = await Promise.all([
-        api.getBooks(),
-        api.getMembers(),
-        api.getIssues(),
-      ]);
-      setBooks(b);
-      setMembers(m);
-      setIssues(i);
-      setLoading(false);
+      try {
+        const [b, m, i] = await Promise.all([
+          bookApi.getAll(),
+          memberApi.getAll(),
+          issueApi.getAll(),
+        ]);
+        setBooks(b);
+        setMembers(m);
+        setIssues(i);
+      } catch (err) {
+        console.error('Failed to load data:', err);
+      } finally {
+        setLoading(false);
+      }
     };
     loadData();
   }, []);
 
-  // Persist whenever state changes
-  useEffect(() => { if (!loading) api.saveBooks(books); }, [books, loading]);
-  useEffect(() => { if (!loading) api.saveMembers(members); }, [members, loading]);
-  useEffect(() => { if (!loading) api.saveIssues(issues); }, [issues, loading]);
+  // ─── Book handlers (real API calls) ───────────────────────
 
-  // --- Book handlers ---
-  const addBook = (book) => setBooks((prev) => [...prev, book]);
+  const addBook = useCallback(async (bookData) => {
+    const newBook = await bookApi.create(bookData);
+    setBooks((prev) => [newBook, ...prev]);
+    return newBook;
+  }, []);
 
-  const editBook = (updated) =>
-    setBooks((prev) => prev.map((b) => (b.id === updated.id ? updated : b)));
+  const editBook = useCallback(async (updated) => {
+    const saved = await bookApi.update(updated.id, updated);
+    setBooks((prev) => prev.map((b) => (b.id === saved.id ? saved : b)));
+    return saved;
+  }, []);
 
-  const deleteBook = (id) =>
+  const deleteBook = useCallback(async (id) => {
+    await bookApi.delete(id);
     setBooks((prev) => prev.filter((b) => b.id !== id));
+  }, []);
 
-  // --- Member handlers ---
-  const addMember = (member) => setMembers((prev) => [...prev, member]);
+  // ─── Member handlers (real API calls) ─────────────────────
 
-  const editMember = (updated) =>
-    setMembers((prev) => prev.map((m) => (m.id === updated.id ? updated : m)));
+  const addMember = useCallback(async (memberData) => {
+    const newMember = await memberApi.create(memberData);
+    setMembers((prev) => [newMember, ...prev]);
+    return newMember;
+  }, []);
 
-  const deleteMember = (id) =>
+  const editMember = useCallback(async (updated) => {
+    const saved = await memberApi.update(updated.id, updated);
+    setMembers((prev) => prev.map((m) => (m.id === saved.id ? saved : m)));
+    return saved;
+  }, []);
+
+  const deleteMember = useCallback(async (id) => {
+    await memberApi.delete(id);
     setMembers((prev) => prev.filter((m) => m.id !== id));
+  }, []);
 
-  // --- Issue/Return handlers ---
-  const issueBook = (newIssue) => {
-    // Decrement book available copies
-    setBooks((prev) =>
-      prev.map((b) =>
-        b.id === newIssue.bookId ? { ...b, copies: b.copies - 1 } : b
-      )
-    );
-    setIssues((prev) => [...prev, newIssue]);
-  };
+  // ─── Issue/Return handlers (real API calls) ───────────────
 
-  const returnBook = (issueId) => {
-    const issue = issues.find((i) => i.id === issueId);
-    if (!issue) return;
-    // Restore the copy
-    setBooks((prev) =>
-      prev.map((b) =>
-        b.id === issue.bookId ? { ...b, copies: b.copies + 1 } : b
-      )
-    );
-    setIssues((prev) =>
-      prev.map((i) =>
-        i.id === issueId
-          ? { ...i, status: 'Returned', returnDate: new Date().toISOString().split('T')[0] }
-          : i
-      )
-    );
-  };
+  const issueBook = useCallback(async (issueData) => {
+    const newIssue = await issueApi.create(issueData);
+    setIssues((prev) => [newIssue, ...prev]);
+    // Refresh books to get updated available counts from DB
+    const freshBooks = await bookApi.getAll();
+    setBooks(freshBooks);
+    return newIssue;
+  }, []);
+
+  const returnBook = useCallback(async (issueId) => {
+    const updated = await issueApi.return(issueId);
+    setIssues((prev) => prev.map((i) => (i.id === updated.id ? updated : i)));
+    // Refresh books to get restored available counts from DB
+    const freshBooks = await bookApi.getAll();
+    setBooks(freshBooks);
+    return updated;
+  }, []);
 
   return (
     <AppContext.Provider

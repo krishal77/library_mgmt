@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import bookRoutes from './routes/bookRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import issueRoutes from './routes/issueRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
@@ -18,6 +19,7 @@ app.get('/api/health', (req, res) => {
 // API Routes
 app.use('/api/books', bookRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/issues', issueRoutes);
 
 // Centralized Error Handling Middleware
 app.use(errorHandler);

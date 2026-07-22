@@ -2,67 +2,213 @@ import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:5001/api';
 
-// Initial Mock Seed Data for standalone frontend demo
-const initialBooks = [
+const client = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 8000,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+// Fallback mock data (used only when the backend is unreachable)
+const fallbackBooks = [
   { id: 'BK101', title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', category: 'Fiction', copies: 4, totalCopies: 5 },
   { id: 'BK102', title: 'Clean Code', author: 'Robert C. Martin', category: 'Technology', copies: 2, totalCopies: 3 },
-  { id: 'BK103', title: 'To Kill a Mockingbird', author: 'Harper Lee', category: 'Classic', copies: 0, totalCopies: 2 },
-  { id: 'BK104', title: 'Design Patterns', author: 'Erich Gamma et al.', category: 'Software', copies: 3, totalCopies: 3 },
-  { id: 'BK105', title: 'Atomic Habits', author: 'James Clear', category: 'Self-Help', copies: 5, totalCopies: 6 }
 ];
-
-const initialMembers = [
-  { id: 'MEM001', name: 'John Doe', email: 'john.doe@example.com', phone: '+1 234 567 8901' },
-  { id: 'MEM002', name: 'Sarah Jenkins', email: 'sarah.j@example.com', phone: '+1 987 654 3210' },
-  { id: 'MEM003', name: 'Alex Rivera', email: 'alex.r@example.com', phone: '+1 555 123 4567' }
+const fallbackMembers = [
+  { id: 'MEM001', name: 'John Doe', email: 'john@example.com', phone: '1234567890' },
 ];
+const fallbackIssues = [];
 
-const initialIssues = [
-  { id: 'ISS1001', memberId: 'MEM001', memberName: 'John Doe', bookId: 'BK101', bookTitle: 'The Great Gatsby', issueDate: '2026-07-15', dueDate: '2026-07-29', returnDate: null, status: 'Issued' },
-  { id: 'ISS1002', memberId: 'MEM002', memberName: 'Sarah Jenkins', bookId: 'BK103', bookTitle: 'To Kill a Mockingbird', issueDate: '2026-07-10', dueDate: '2026-07-24', returnDate: null, status: 'Issued' }
-];
-
-// Helper for Local Storage persistence
-const getStorageItem = (key, fallback) => {
-  const saved = localStorage.getItem(key);
-  return saved ? JSON.parse(saved) : fallback;
+const getStorage = (key, fallback) => {
+  try { return JSON.parse(localStorage.getItem(key)) || fallback; }
+  catch { return fallback; }
 };
 
-const setStorageItem = (key, data) => {
-  localStorage.setItem(key, JSON.stringify(data));
+/**
+ * Normalise a backend Book document → frontend shape.
+ * Backend uses { _id, title, author, isbn, category, quantity, available }
+ * Frontend uses { id, title, author, isbn, category, copies, totalCopies }
+ */
+const normaliseBook = (doc) => ({
+  id: doc._id || doc.id,
+  title: doc.title,
+  author: doc.author,
+  isbn: doc.isbn || '',
+  category: doc.category,
+  copies: doc.available !== undefined ? doc.available : (doc.copies ?? 0),
+  totalCopies: doc.quantity !== undefined ? doc.quantity : (doc.totalCopies ?? 0),
+});
+
+/**
+ * Normalise a backend User document → frontend "member" shape.
+ * Backend uses { _id, name, email, phone, role }
+ * Frontend uses { id, name, email, phone }
+ */
+const normaliseMember = (doc) => ({
+  id: doc._id || doc.id,
+  name: doc.name,
+  email: doc.email,
+  phone: doc.phone || '',
+});
+
+/**
+ * Normalise a backend Issue document → frontend shape.
+ * Backend returns populated { _id, book: { _id, title }, user: { _id, name }, ... }
+ * Frontend uses { id, bookId, bookTitle, memberId, memberName, issueDate, dueDate, returnDate, status }
+ */
+const normaliseIssue = (doc) => ({
+  id: doc._id || doc.id,
+  bookId: doc.book?._id || doc.book || doc.bookId,
+  bookTitle: doc.book?.title || doc.bookTitle || '',
+  memberId: doc.user?._id || doc.user || doc.memberId,
+  memberName: doc.user?.name || doc.memberName || '',
+  issueDate: doc.issueDate ? new Date(doc.issueDate).toISOString().split('T')[0] : '',
+  dueDate: doc.dueDate ? new Date(doc.dueDate).toISOString().split('T')[0] : '',
+  returnDate: doc.returnDate ? new Date(doc.returnDate).toISOString().split('T')[0] : null,
+  status: doc.status || 'Issued',
+});
+
+// ─── BOOKS ──────────────────────────────────────────────────
+
+export const bookApi = {
+  getAll: async () => {
+    try {
+      const res = await client.get('/books');
+      return (res.data.data || []).map(normaliseBook);
+    } catch {
+      return getStorage('lms_books', fallbackBooks);
+    }
+  },
+
+  create: async (bookData) => {
+    try {
+      const res = await client.post('/books', {
+        title: bookData.title,
+        author: bookData.author,
+        isbn: bookData.isbn,
+        category: bookData.category,
+        quantity: parseInt(bookData.copies, 10) || 1,
+        available: parseInt(bookData.copies, 10) || 1,
+      });
+      return normaliseBook(res.data.data);
+    } catch (err) {
+      throw new Error(err.response?.data?.message || 'Failed to create book');
+    }
+  },
+
+  update: async (id, bookData) => {
+    try {
+      const res = await client.put(`/books/${id}`, {
+        title: bookData.title,
+        author: bookData.author,
+        isbn: bookData.isbn,
+        category: bookData.category,
+        quantity: parseInt(bookData.totalCopies, 10) || undefined,
+        available: parseInt(bookData.copies, 10) || undefined,
+      });
+      return normaliseBook(res.data.data);
+    } catch (err) {
+      throw new Error(err.response?.data?.message || 'Failed to update book');
+    }
+  },
+
+  delete: async (id) => {
+    try {
+      await client.delete(`/books/${id}`);
+    } catch (err) {
+      throw new Error(err.response?.data?.message || 'Failed to delete book');
+    }
+  },
 };
 
+// ─── MEMBERS (backend: /api/users) ──────────────────────────
+
+export const memberApi = {
+  getAll: async () => {
+    try {
+      const res = await client.get('/users');
+      return (res.data.data || []).map(normaliseMember);
+    } catch {
+      return getStorage('lms_members', fallbackMembers);
+    }
+  },
+
+  create: async (memberData) => {
+    try {
+      const res = await client.post('/users', {
+        name: memberData.name,
+        email: memberData.email,
+        phone: memberData.phone,
+        role: 'student',
+      });
+      return normaliseMember(res.data.data);
+    } catch (err) {
+      throw new Error(err.response?.data?.message || 'Failed to create member');
+    }
+  },
+
+  update: async (id, memberData) => {
+    try {
+      const res = await client.put(`/users/${id}`, {
+        name: memberData.name,
+        email: memberData.email,
+        phone: memberData.phone,
+      });
+      return normaliseMember(res.data.data);
+    } catch (err) {
+      throw new Error(err.response?.data?.message || 'Failed to update member');
+    }
+  },
+
+  delete: async (id) => {
+    try {
+      await client.delete(`/users/${id}`);
+    } catch (err) {
+      throw new Error(err.response?.data?.message || 'Failed to delete member');
+    }
+  },
+};
+
+// ─── ISSUES ─────────────────────────────────────────────────
+
+export const issueApi = {
+  getAll: async () => {
+    try {
+      const res = await client.get('/issues');
+      return (res.data.data || []).map(normaliseIssue);
+    } catch {
+      return getStorage('lms_issues', fallbackIssues);
+    }
+  },
+
+  create: async (issueData) => {
+    try {
+      const res = await client.post('/issues', {
+        book: issueData.bookId,
+        user: issueData.memberId,
+        dueDate: issueData.dueDate,
+      });
+      return normaliseIssue(res.data.data);
+    } catch (err) {
+      throw new Error(err.response?.data?.message || 'Failed to issue book');
+    }
+  },
+
+  return: async (id) => {
+    try {
+      const res = await client.put(`/issues/${id}/return`);
+      return normaliseIssue(res.data.data);
+    } catch (err) {
+      throw new Error(err.response?.data?.message || 'Failed to return book');
+    }
+  },
+};
+
+// Legacy compat — keep the old `api` export so any stray imports don't crash
 export const api = {
-  // Books API
-  getBooks: async () => {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/books`);
-      return response.data;
-    } catch {
-      return getStorageItem('lms_books', initialBooks);
-    }
-  },
-  saveBooks: (books) => setStorageItem('lms_books', books),
-
-  // Members API
-  getMembers: async () => {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/members`);
-      return response.data;
-    } catch {
-      return getStorageItem('lms_members', initialMembers);
-    }
-  },
-  saveMembers: (members) => setStorageItem('lms_members', members),
-
-  // Issues API
-  getIssues: async () => {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/issues`);
-      return response.data;
-    } catch {
-      return getStorageItem('lms_issues', initialIssues);
-    }
-  },
-  saveIssues: (issues) => setStorageItem('lms_issues', issues),
+  getBooks: bookApi.getAll,
+  getMembers: memberApi.getAll,
+  getIssues: issueApi.getAll,
+  saveBooks: () => {},
+  saveMembers: () => {},
+  saveIssues: () => {},
 };
