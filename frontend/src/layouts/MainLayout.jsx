@@ -1,145 +1,169 @@
-// Main application layout wrapper
+// Main application layout wrapper — uses vanilla CSS (no Tailwind)
 
 import React, { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  BookOpen, 
-  Users, 
-  ArrowLeftRight, 
-  LogOut, 
-  Menu, 
-  X, 
-  Library 
-} from 'lucide-react';
 
 const MainLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
   const navItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-    { name: 'Book Management', path: '/books', icon: BookOpen },
-    { name: 'Member Management', path: '/members', icon: Users },
-    { name: 'Issue & Return', path: '/issues', icon: ArrowLeftRight },
+    {
+      name: 'Dashboard',
+      path: '/dashboard',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <rect x="3" y="3" width="7" height="7" />
+          <rect x="14" y="3" width="7" height="7" />
+          <rect x="14" y="14" width="7" height="7" />
+          <rect x="3" y="14" width="7" height="7" />
+        </svg>
+      ),
+    },
+    {
+      name: 'Books',
+      path: '/books',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+        </svg>
+      ),
+    },
+    {
+      name: 'Members',
+      path: '/members',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+      ),
+    },
+    {
+      name: 'Issue & Return',
+      path: '/issues',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <polyline points="17 1 21 5 17 9" />
+          <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+          <polyline points="7 23 3 19 7 15" />
+          <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+        </svg>
+      ),
+    },
   ];
 
   const handleLogout = () => {
-    // Clear session tokens/auth state here if applicable
     localStorage.removeItem('token');
     navigate('/login');
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row">
+    <div className="layout-root">
       {/* Mobile Backdrop */}
       {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-slate-900/50 z-40 md:hidden transition-opacity"
+        <div
+          className="sidebar-backdrop"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-      <aside 
-        className={`
-          fixed md:static inset-y-0 left-0 z-50
-          w-64 bg-slate-900 text-slate-300 flex flex-col justify-between
-          transform transition-transform duration-200 ease-in-out
-          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
-        `}
-      >
-        <div>
-          {/* Brand Header */}
-          <div className="h-16 flex items-center justify-between px-6 bg-slate-950/50 border-b border-slate-800">
-            <div className="flex items-center space-x-3 text-indigo-400">
-              <Library className="w-7 h-7" />
-              <span className="font-bold text-lg text-white tracking-wide">
-                LibAdmin
-              </span>
-            </div>
-            <button 
-              className="md:hidden text-slate-400 hover:text-white"
-              onClick={() => setSidebarOpen(false)}
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </div>
-
-          {/* Navigation Links */}
-          <nav className="mt-6 px-4 space-y-1.5">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <NavLink
-                  key={item.path}
-                  to={item.path}
-                  onClick={() => setSidebarOpen(false)}
-                  className={({ isActive }) => `
-                    flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium
-                    transition-colors duration-150
-                    ${isActive 
-                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' 
-                      : 'hover:bg-slate-800/80 hover:text-white text-slate-400'}
-                  `}
-                >
-                  <Icon className="w-5 h-5 shrink-0" />
-                  <span>{item.name}</span>
-                </NavLink>
-              );
-            })}
-          </nav>
-        </div>
-
-        {/* User Info & Logout Button */}
-        <div className="p-4 border-t border-slate-800 bg-slate-950/30">
-          <div className="flex items-center space-x-3 mb-3 px-2">
-            <div className="w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-sm">
-              A
-            </div>
-            <div className="truncate">
-              <p className="text-xs font-semibold text-white truncate">Librarian Admin</p>
-              <p className="text-[11px] text-slate-400 truncate">admin@library.com</p>
-            </div>
+      <aside className={`sidebar${sidebarOpen ? ' sidebar-open' : ''}`}>
+        {/* Brand Header */}
+        <div className="sidebar-brand">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#818cf8' }}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+            </svg>
+            <span style={{ fontWeight: 700, fontSize: '1.15rem', color: '#fff', letterSpacing: '0.02em' }}>
+              LibAdmin
+            </span>
           </div>
           <button
-            onClick={handleLogout}
-            className="w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg text-sm font-medium text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition-colors"
+            className="sidebar-close-btn"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Close sidebar"
           >
-            <LogOut className="w-5 h-5 shrink-0" />
-            <span>Logout</span>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Navigation Links */}
+        <nav className="sidebar-nav">
+          {navItems.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              onClick={() => setSidebarOpen(false)}
+              className={({ isActive }) =>
+                `sidebar-link${isActive ? ' sidebar-link-active' : ''}`
+              }
+            >
+              {item.icon}
+              <span>{item.name}</span>
+            </NavLink>
+          ))}
+        </nav>
+
+        {/* User Info & Logout */}
+        <div className="sidebar-footer">
+          <div className="sidebar-user">
+            <div className="sidebar-avatar">A</div>
+            <div style={{ overflow: 'hidden' }}>
+              <p style={{ fontSize: '0.8rem', fontWeight: 600, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                Librarian Admin
+              </p>
+              <p style={{ fontSize: '0.7rem', color: '#94a3b8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                admin@library.com
+              </p>
+            </div>
+          </div>
+          <button className="sidebar-logout-btn" onClick={handleLogout}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            Logout
           </button>
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="layout-main">
         {/* Top Navbar */}
-        <header className="h-16 bg-white border-b border-slate-200 px-4 md:px-8 flex items-center justify-between sticky top-0 z-30 shadow-xs">
-          <div className="flex items-center space-x-4">
+        <header className="layout-topbar">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <button
+              className="topbar-menu-btn"
               onClick={() => setSidebarOpen(true)}
-              className="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100"
               aria-label="Open menu"
             >
-              <Menu className="w-6 h-6" />
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
             </button>
-            <h1 className="text-lg font-semibold text-slate-800 hidden sm:block">
-              Library Management System
-            </h1>
+            <h1 className="topbar-title">Library Management System</h1>
           </div>
 
-          {/* Top Bar Quick Status */}
-          <div className="flex items-center space-x-3">
-            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
-              System Online
-            </span>
-          </div>
+          <span className="system-status-badge">
+            <span className="status-dot" />
+            System Online
+          </span>
         </header>
 
         {/* Dynamic Page Content */}
-        <main className="flex-1 p-4 md:p-8 max-w-7xl w-full mx-auto">
+        <main className="layout-content">
           <Outlet />
         </main>
       </div>

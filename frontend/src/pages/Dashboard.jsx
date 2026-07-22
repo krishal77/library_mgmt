@@ -1,10 +1,15 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAppContext } from '../context/AppContext';
 
-export default function Dashboard({ books, members, issues, onNavigate, onOpenModal }) {
+export default function Dashboard() {
+  const { books, members, issues } = useAppContext();
+  const navigate = useNavigate();
+
   const totalBooks = books.reduce((acc, b) => acc + (b.totalCopies || b.copies || 1), 0);
   const booksAvailable = books.reduce((acc, b) => acc + (b.copies || 0), 0);
   const totalMembers = members.length;
-  const booksIssued = issues.filter(i => i.status === 'Issued').length;
+  const booksIssued = issues.filter((i) => i.status === 'Issued').length;
 
   return (
     <div>
@@ -14,13 +19,13 @@ export default function Dashboard({ books, members, issues, onNavigate, onOpenMo
           <p>Welcome back! Here is what's happening in your library today.</p>
         </div>
         <div style={{ display: 'flex', gap: '0.75rem' }}>
-          <button className="btn-secondary" onClick={() => onOpenModal('addBook')}>
+          <button className="btn-secondary" onClick={() => navigate('/books')}>
             + Add Book
           </button>
-          <button className="btn-secondary" onClick={() => onOpenModal('addMember')}>
+          <button className="btn-secondary" onClick={() => navigate('/members')}>
             + Add Member
           </button>
-          <button className="btn-primary" onClick={() => onNavigate('issueReturn')}>
+          <button className="btn-primary" onClick={() => navigate('/issues')}>
             Issue Book
           </button>
         </div>
@@ -82,19 +87,19 @@ export default function Dashboard({ books, members, issues, onNavigate, onOpenMo
         </div>
       </div>
 
-      {/* Quick Action Cards Section */}
+      {/* Quick Action + Recent Issues */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1.5rem' }}>
           <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>Quick Actions</h3>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.25rem' }}>Perform common administrative tasks in one click.</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            <button className="btn-secondary" style={{ justifyContent: 'flex-start' }} onClick={() => onOpenModal('addBook')}>
+            <button className="btn-secondary" style={{ justifyContent: 'flex-start' }} onClick={() => navigate('/books')}>
               📖 Add a New Book
             </button>
-            <button className="btn-secondary" style={{ justifyContent: 'flex-start' }} onClick={() => onOpenModal('addMember')}>
+            <button className="btn-secondary" style={{ justifyContent: 'flex-start' }} onClick={() => navigate('/members')}>
               👤 Register New Member
             </button>
-            <button className="btn-secondary" style={{ justifyContent: 'flex-start' }} onClick={() => onNavigate('issueReturn')}>
+            <button className="btn-secondary" style={{ justifyContent: 'flex-start' }} onClick={() => navigate('/issues')}>
               🔄 Issue or Return Book
             </button>
           </div>
@@ -104,7 +109,7 @@ export default function Dashboard({ books, members, issues, onNavigate, onOpenMo
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1.5rem', gridColumn: 'span 2' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
             <h3 style={{ fontSize: '1.1rem' }}>Recent Book Issues</h3>
-            <button className="btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }} onClick={() => onNavigate('issueReturn')}>
+            <button className="btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }} onClick={() => navigate('/issues')}>
               View All
             </button>
           </div>

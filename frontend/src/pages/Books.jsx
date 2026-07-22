@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
+import { useAppContext } from '../context/AppContext';
 
-export default function Books({ books, onAddBook, onEditBook, onDeleteBook }) {
+export default function Books() {
+  const { books, addBook, editBook, deleteBook } = useAppContext();
+
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBook, setEditingBook] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
     author: '',
-    category: '',
-    copies: 1
+    isbn: '',
+    category: 'Fiction',
+    copies: 1,
   });
 
   const filteredBooks = books.filter((book) => {
@@ -17,13 +21,14 @@ export default function Books({ books, onAddBook, onEditBook, onDeleteBook }) {
       book.title.toLowerCase().includes(term) ||
       book.author.toLowerCase().includes(term) ||
       book.category.toLowerCase().includes(term) ||
-      book.id.toLowerCase().includes(term)
+      (book.id || '').toLowerCase().includes(term) ||
+      (book.isbn || '').toLowerCase().includes(term)
     );
   });
 
   const handleOpenAddModal = () => {
     setEditingBook(null);
-    setFormData({ title: '', author: '', category: 'Fiction', copies: 1 });
+    setFormData({ title: '', author: '', isbn: '', category: 'Fiction', copies: 1 });
     setIsModalOpen(true);
   };
 
@@ -32,8 +37,9 @@ export default function Books({ books, onAddBook, onEditBook, onDeleteBook }) {
     setFormData({
       title: book.title,
       author: book.author,
+      isbn: book.isbn || '',
       category: book.category,
-      copies: book.copies !== undefined ? book.copies : 1
+      copies: book.copies !== undefined ? book.copies : 1,
     });
     setIsModalOpen(true);
   };
@@ -42,24 +48,29 @@ export default function Books({ books, onAddBook, onEditBook, onDeleteBook }) {
     e.preventDefault();
     if (!formData.title || !formData.author) return;
 
+    const copiesNum = parseInt(formData.copies, 10) || 1;
+
     if (editingBook) {
-      onEditBook({
+      editBook({
         ...editingBook,
         title: formData.title,
         author: formData.author,
+        isbn: formData.isbn,
         category: formData.category,
-        copies: parseInt(formData.copies, 10)
+        copies: copiesNum,
+        totalCopies: editingBook.totalCopies || copiesNum,
       });
     } else {
       const newBook = {
         id: `BK${Math.floor(100 + Math.random() * 900)}`,
         title: formData.title,
         author: formData.author,
+        isbn: formData.isbn,
         category: formData.category,
-        copies: parseInt(formData.copies, 10),
-        totalCopies: parseInt(formData.copies, 10)
+        copies: copiesNum,
+        totalCopies: copiesNum,
       };
-      onAddBook(newBook);
+      addBook(newBook);
     }
     setIsModalOpen(false);
   };
@@ -113,7 +124,7 @@ export default function Books({ books, onAddBook, onEditBook, onDeleteBook }) {
             {filteredBooks.length === 0 ? (
               <tr>
                 <td colSpan="7" className="empty-state">
-                  No books found matching "{searchTerm}".
+                  {searchTerm ? `No books found matching "${searchTerm}".` : 'No books in the library yet. Add one!'}
                 </td>
               </tr>
             ) : (
@@ -141,7 +152,7 @@ export default function Books({ books, onAddBook, onEditBook, onDeleteBook }) {
                           <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                         </svg>
                       </button>
-                      <button className="btn-icon delete" title="Delete Book" onClick={() => onDeleteBook(book.id)}>
+                      <button className="btn-icon delete" title="Delete Book" onClick={() => deleteBook(book.id)}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                           <polyline points="3 6 5 6 21 6"></polyline>
                           <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -186,6 +197,17 @@ export default function Books({ books, onAddBook, onEditBook, onDeleteBook }) {
                   placeholder="e.g. Robert C. Martin"
                   value={formData.author}
                   onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>ISBN</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="e.g. 9780132350884"
+                  value={formData.isbn}
+                  onChange={(e) => setFormData({ ...formData, isbn: e.target.value })}
                 />
               </div>
 

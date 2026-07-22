@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-export default function Login({ onLogin }) {
+export default function Login() {
+  const navigate = useNavigate();
   const [credentials, setCredentials] = useState({
     username: '',
-    password: ''
+    password: '',
   });
   const [error, setError] = useState('');
 
   const handleChange = (e) => {
     setCredentials({
       ...credentials,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
     setError('');
   };
@@ -21,8 +23,8 @@ export default function Login({ onLogin }) {
       setError('Please fill in both Username/Email and Password.');
       return;
     }
-    // Simple demo authentication logic
-    onLogin({ username: credentials.username, role: 'Librarian Admin' });
+    // Demo authentication — navigate to dashboard on success
+    navigate('/dashboard');
   };
 
   return (
@@ -58,6 +60,7 @@ export default function Login({ onLogin }) {
             <label>Username / Email</label>
             <input
               type="text"
+              id="login-username"
               name="username"
               className="form-control"
               placeholder="admin@library.com"
@@ -71,6 +74,7 @@ export default function Login({ onLogin }) {
             <label>Password</label>
             <input
               type="password"
+              id="login-password"
               name="password"
               className="form-control"
               placeholder="••••••••"
@@ -79,10 +83,19 @@ export default function Login({ onLogin }) {
             />
           </div>
 
-          <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: '1.5rem', padding: '0.85rem' }}>
+          <button
+            type="submit"
+            id="login-submit"
+            className="btn-primary"
+            style={{ width: '100%', justifyContent: 'center', marginTop: '1.5rem', padding: '0.85rem' }}
+          >
             Login to Account
           </button>
         </form>
+
+        <p style={{ textAlign: 'center', marginTop: '1rem', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+          Demo: any username &amp; password will work
+        </p>
       </div>
     </div>
   );

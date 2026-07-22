@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
+import { useAppContext } from '../context/AppContext';
 
-export default function Members({ members, onAddMember, onEditMember, onDeleteMember }) {
+export default function Members() {
+  const { members, addMember, editMember, deleteMember } = useAppContext();
+
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    phone: ''
+    phone: '',
   });
 
   const filteredMembers = members.filter((member) => {
@@ -15,8 +18,8 @@ export default function Members({ members, onAddMember, onEditMember, onDeleteMe
     return (
       member.name.toLowerCase().includes(term) ||
       member.email.toLowerCase().includes(term) ||
-      member.phone.toLowerCase().includes(term) ||
-      member.id.toLowerCase().includes(term)
+      (member.phone || '').toLowerCase().includes(term) ||
+      (member.id || '').toLowerCase().includes(term)
     );
   });
 
@@ -31,7 +34,7 @@ export default function Members({ members, onAddMember, onEditMember, onDeleteMe
     setFormData({
       name: member.name,
       email: member.email,
-      phone: member.phone
+      phone: member.phone || '',
     });
     setIsModalOpen(true);
   };
@@ -41,20 +44,20 @@ export default function Members({ members, onAddMember, onEditMember, onDeleteMe
     if (!formData.name || !formData.email) return;
 
     if (editingMember) {
-      onEditMember({
+      editMember({
         ...editingMember,
         name: formData.name,
         email: formData.email,
-        phone: formData.phone
+        phone: formData.phone,
       });
     } else {
       const newMember = {
-        id: `MEM00${members.length + 1}`,
+        id: `MEM${String(members.length + 1).padStart(3, '0')}`,
         name: formData.name,
         email: formData.email,
-        phone: formData.phone
+        phone: formData.phone,
       };
-      onAddMember(newMember);
+      addMember(newMember);
     }
     setIsModalOpen(false);
   };
@@ -106,7 +109,7 @@ export default function Members({ members, onAddMember, onEditMember, onDeleteMe
             {filteredMembers.length === 0 ? (
               <tr>
                 <td colSpan="5" className="empty-state">
-                  No registered members found matching "{searchTerm}".
+                  {searchTerm ? `No members found matching "${searchTerm}".` : 'No members registered yet. Add one!'}
                 </td>
               </tr>
             ) : (
@@ -115,7 +118,7 @@ export default function Members({ members, onAddMember, onEditMember, onDeleteMe
                   <td style={{ fontWeight: '600', color: 'var(--accent-sky)' }}>{member.id}</td>
                   <td style={{ fontWeight: '600' }}>{member.name}</td>
                   <td>{member.email}</td>
-                  <td>{member.phone}</td>
+                  <td>{member.phone || '—'}</td>
                   <td style={{ textAlign: 'right' }}>
                     <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
                       <button className="btn-icon edit" title="Edit Member" onClick={() => handleOpenEditModal(member)}>
@@ -124,7 +127,7 @@ export default function Members({ members, onAddMember, onEditMember, onDeleteMe
                           <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                         </svg>
                       </button>
-                      <button className="btn-icon delete" title="Delete Member" onClick={() => onDeleteMember(member.id)}>
+                      <button className="btn-icon delete" title="Delete Member" onClick={() => deleteMember(member.id)}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                           <polyline points="3 6 5 6 21 6"></polyline>
                           <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>

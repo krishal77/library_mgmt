@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
+import { useAppContext } from '../context/AppContext';
 
-export default function IssueReturn({ books, members, issues, onIssueBook, onReturnBook }) {
+export default function IssueReturn() {
+  const { books, members, issues, issueBook, returnBook } = useAppContext();
+
   const [selectedMemberId, setSelectedMemberId] = useState('');
   const [selectedBookId, setSelectedBookId] = useState('');
   const [dueDate, setDueDate] = useState(() => {
@@ -9,6 +12,7 @@ export default function IssueReturn({ books, members, issues, onIssueBook, onRet
     return defaultDue.toISOString().split('T')[0];
   });
   const [errorMsg, setErrorMsg] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
 
   const availableBooks = books.filter((b) => b.copies > 0);
 
@@ -16,6 +20,7 @@ export default function IssueReturn({ books, members, issues, onIssueBook, onRet
     e.preventDefault();
     if (!selectedMemberId || !selectedBookId) {
       setErrorMsg('Please select both a member and an available book.');
+      setSuccessMsg('');
       return;
     }
 
@@ -24,6 +29,7 @@ export default function IssueReturn({ books, members, issues, onIssueBook, onRet
 
     if (!book || book.copies <= 0) {
       setErrorMsg('Selected book is out of stock!');
+      setSuccessMsg('');
       return;
     }
 
@@ -37,20 +43,22 @@ export default function IssueReturn({ books, members, issues, onIssueBook, onRet
       issueDate: today,
       dueDate: dueDate,
       returnDate: null,
-      status: 'Issued'
+      status: 'Issued',
     };
 
-    onIssueBook(newIssue);
+    issueBook(newIssue);
     setSelectedMemberId('');
     setSelectedBookId('');
     setErrorMsg('');
+    setSuccessMsg(`"${book.title}" successfully issued to ${member.name}.`);
+    setTimeout(() => setSuccessMsg(''), 4000);
   };
 
   return (
     <div>
       <div className="page-header">
         <div className="page-title">
-          <h1>Issue & Return Books</h1>
+          <h1>Issue &amp; Return Books</h1>
           <p>Process book lending transactions and track return status.</p>
         </div>
       </div>
@@ -66,6 +74,12 @@ export default function IssueReturn({ books, members, issues, onIssueBook, onRet
           {errorMsg && (
             <div style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171', padding: '0.75rem', borderRadius: '8px', fontSize: '0.85rem', marginBottom: '1rem', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
               {errorMsg}
+            </div>
+          )}
+
+          {successMsg && (
+            <div style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#34d399', padding: '0.75rem', borderRadius: '8px', fontSize: '0.85rem', marginBottom: '1rem', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+              ✅ {successMsg}
             </div>
           )}
 
@@ -116,14 +130,14 @@ export default function IssueReturn({ books, members, issues, onIssueBook, onRet
             </div>
 
             <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }}>
-              🔄 Confirm & Issue Book
+              🔄 Confirm &amp; Issue Book
             </button>
           </form>
         </div>
 
         {/* Info box / instructions */}
         <div style={{ background: 'rgba(99, 102, 241, 0.08)', border: '1px solid rgba(99, 102, 241, 0.2)', borderRadius: 'var(--radius-lg)', padding: '1.75rem', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          <h3 style={{ color: '#818cf8', fontSize: '1.1rem', marginBottom: '0.75rem' }}>Lending Rules & Policy</h3>
+          <h3 style={{ color: '#818cf8', fontSize: '1.1rem', marginBottom: '0.75rem' }}>Lending Rules &amp; Policy</h3>
           <ul style={{ color: 'var(--text-muted)', fontSize: '0.9rem', paddingLeft: '1.2rem', lineHeight: '1.7' }}>
             <li>Standard borrowing duration is set to 14 days by default.</li>
             <li>Members cannot borrow copies of books with zero available stock.</li>
@@ -173,7 +187,7 @@ export default function IssueReturn({ books, members, issues, onIssueBook, onRet
                       <button
                         className="btn-secondary"
                         style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}
-                        onClick={() => onReturnBook(issue.id)}
+                        onClick={() => returnBook(issue.id)}
                       >
                         Return Book
                       </button>
