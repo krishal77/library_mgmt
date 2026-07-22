@@ -43,13 +43,13 @@ export default function Login() {
 
         {error && (
           <div style={{
-            background: 'rgba(239, 68, 68, 0.15)',
-            color: '#f87171',
+            background: 'rgba(127, 29, 29, 0.07)',
+            color: '#7F1D1D',
             padding: '0.75rem',
             borderRadius: '8px',
             fontSize: '0.85rem',
             marginBottom: '1rem',
-            border: '1px solid rgba(239, 68, 68, 0.3)'
+            border: '1px solid rgba(127, 29, 29, 0.18)'
           }}>
             {error}
           </div>

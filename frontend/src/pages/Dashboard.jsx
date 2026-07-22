@@ -89,7 +89,7 @@ export default function Dashboard() {
 
       {/* Quick Action + Recent Issues */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
-        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1.5rem' }}>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', padding: '1.5rem' }}>
           <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>Quick Actions</h3>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.25rem' }}>Perform common administrative tasks in one click.</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>

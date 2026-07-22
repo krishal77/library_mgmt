@@ -72,13 +72,13 @@ export default function IssueReturn() {
           </p>
 
           {errorMsg && (
-            <div style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171', padding: '0.75rem', borderRadius: '8px', fontSize: '0.85rem', marginBottom: '1rem', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
+            <div style={{ background: 'rgba(127, 29, 29, 0.07)', color: '#7F1D1D', padding: '0.75rem', borderRadius: '8px', fontSize: '0.85rem', marginBottom: '1rem', border: '1px solid rgba(127, 29, 29, 0.18)' }}>
               {errorMsg}
             </div>
           )}
 
           {successMsg && (
-            <div style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#34d399', padding: '0.75rem', borderRadius: '8px', fontSize: '0.85rem', marginBottom: '1rem', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+            <div style={{ background: 'rgba(45, 106, 79, 0.08)', color: '#2D6A4F', padding: '0.75rem', borderRadius: '8px', fontSize: '0.85rem', marginBottom: '1rem', border: '1px solid rgba(45, 106, 79, 0.18)' }}>
               ✅ {successMsg}
             </div>
           )}
@@ -136,8 +136,8 @@ export default function IssueReturn() {
         </div>
 
         {/* Info box / instructions */}
-        <div style={{ background: 'rgba(99, 102, 241, 0.08)', border: '1px solid rgba(99, 102, 241, 0.2)', borderRadius: 'var(--radius-lg)', padding: '1.75rem', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          <h3 style={{ color: '#818cf8', fontSize: '1.1rem', marginBottom: '0.75rem' }}>Lending Rules &amp; Policy</h3>
+        <div style={{ background: 'rgba(17, 17, 17, 0.04)', border: '1px solid rgba(17, 17, 17, 0.10)', borderRadius: 'var(--radius-lg)', padding: '1.75rem', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <h3 style={{ color: '#2D6A4F', fontSize: '1.0rem', marginBottom: '0.75rem', fontWeight: 600 }}>Lending Rules &amp; Policy</h3>
           <ul style={{ color: 'var(--text-muted)', fontSize: '0.9rem', paddingLeft: '1.2rem', lineHeight: '1.7' }}>
             <li>Standard borrowing duration is set to 14 days by default.</li>
             <li>Members cannot borrow copies of books with zero available stock.</li>
@@ -172,7 +172,7 @@ export default function IssueReturn() {
             ) : (
               issues.map((issue) => (
                 <tr key={issue.id}>
-                  <td style={{ fontWeight: '600', color: 'var(--accent-sky)' }}>{issue.id}</td>
+                  <td style={{ fontWeight: '600', color: 'var(--accent-blue)' }}>{issue.id}</td>
                   <td style={{ fontWeight: '600' }}>{issue.memberName}</td>
                   <td>{issue.bookTitle}</td>
                   <td>{issue.issueDate}</td>

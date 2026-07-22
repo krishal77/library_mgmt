@@ -75,12 +75,14 @@ const MainLayout = () => {
       <aside className={`sidebar${sidebarOpen ? ' sidebar-open' : ''}`}>
         {/* Brand Header */}
         <div className="sidebar-brand">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#818cf8' }}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-            </svg>
-            <span style={{ fontWeight: 700, fontSize: '1.15rem', color: '#fff', letterSpacing: '0.02em' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', position: 'relative', zIndex: 1 }}>
+            <div className="sidebar-brand-icon-wrap">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+              </svg>
+            </div>
+            <span style={{ fontWeight: 700, fontSize: '1.05rem', color: '#E8E0D4', letterSpacing: '-0.01em' }}>
               LibAdmin
             </span>
           </div>
@@ -118,10 +120,10 @@ const MainLayout = () => {
           <div className="sidebar-user">
             <div className="sidebar-avatar">A</div>
             <div style={{ overflow: 'hidden' }}>
-              <p style={{ fontSize: '0.8rem', fontWeight: 600, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <p style={{ fontSize: '0.8rem', fontWeight: 600, color: '#E8E0D4', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 Librarian Admin
               </p>
-              <p style={{ fontSize: '0.7rem', color: '#94a3b8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <p style={{ fontSize: '0.7rem', color: '#777', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 admin@library.com
               </p>
             </div>

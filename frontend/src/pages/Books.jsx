@@ -130,7 +130,7 @@ export default function Books() {
             ) : (
               filteredBooks.map((book) => (
                 <tr key={book.id}>
-                  <td style={{ fontWeight: '600', color: 'var(--accent-sky)' }}>{book.id}</td>
+                  <td style={{ fontWeight: '600', color: 'var(--accent-blue)' }}>{book.id}</td>
                   <td style={{ fontWeight: '600' }}>{book.title}</td>
                   <td>{book.author}</td>
                   <td>

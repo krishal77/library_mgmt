@@ -115,7 +115,7 @@ export default function Members() {
             ) : (
               filteredMembers.map((member) => (
                 <tr key={member.id}>
-                  <td style={{ fontWeight: '600', color: 'var(--accent-sky)' }}>{member.id}</td>
+                  <td style={{ fontWeight: '600', color: 'var(--accent-blue)' }}>{member.id}</td>
                   <td style={{ fontWeight: '600' }}>{member.name}</td>
                   <td>{member.email}</td>
                   <td>{member.phone || '—'}</td>

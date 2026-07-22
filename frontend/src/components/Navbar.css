@@ -1,11 +1,16 @@
+/* Navbar.css — warm cream & black redesign */
+
 .navbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px 40px;
-  background: linear-gradient(135deg, #6B57B8, #8A76D6);
-  box-shadow: 0 4px 20px rgba(107, 87, 184, 0.25);
-  font-family: 'Manrope', sans-serif;
+  padding: 0 2rem;
+  height: 64px;
+  background: rgba(245, 240, 232, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid #E2D9CE;
+  font-family: 'Inter', sans-serif;
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -18,25 +23,26 @@
 }
 
 .navbar-logo {
-  font-size: 28px;
+  font-size: 24px;
 }
 
 .navbar-title {
-  font-family: 'Fraunces', serif;
-  font-size: 24px;
-  color: white;
+  font-family: 'Inter', sans-serif;
+  font-size: 1.1rem;
+  color: #111111;
   font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .navbar-title em {
-  color: #FFD98E;
-  font-style: italic;
+  color: #2D6A4F;
+  font-style: normal;
 }
 
 .navbar-links {
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: 4px;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -48,44 +54,39 @@
 
 .navbar-link {
   text-decoration: none;
-  color: #EDE8FA;
-  font-size: 16px;
+  color: #8A8278;
+  font-size: 0.9rem;
   font-weight: 500;
-  position: relative;
-  transition: color 0.3s ease;
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  transition: background-color 0.16s ease, color 0.16s ease;
 }
 
 .navbar-link:hover {
-  color: white;
+  color: #111111;
+  background-color: rgba(17, 17, 17, 0.06);
 }
 
 .navbar-link.active {
-  color: white;
-}
-
-.navbar-link.active::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -8px;
-  width: 100%;
-  height: 3px;
-  background: #FFD98E;
-  border-radius: 10px;
+  color: #111111;
+  background-color: rgba(17, 17, 17, 0.08);
+  font-weight: 600;
 }
 
 .navbar-login {
-  padding: 10px 24px;
-  border: none;
-  border-radius: 50px;
-  background: white;
-  color: #6B57B8;
+  padding: 0.55rem 1.25rem;
+  border: 1px solid #D4CCC2;
+  border-radius: 8px;
+  background: #111111;
+  color: #F5F0E8;
   font-weight: 600;
+  font-size: 0.875rem;
   cursor: pointer;
-  transition: 0.3s;
+  font-family: inherit;
+  transition: background-color 0.16s ease, transform 0.12s ease;
 }
 
 .navbar-login:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 18px rgba(0,0,0,0.2);
+  background-color: #2A2A2A;
+  transform: translateY(-1px);
 }
